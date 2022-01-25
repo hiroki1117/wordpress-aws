@@ -1,0 +1,2 @@
+# AWSでのWordpress構成
+
