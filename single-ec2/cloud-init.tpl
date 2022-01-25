@@ -23,6 +23,10 @@ runcmd:
     - systemctl start httpd
     - systemctl enable httpd
 
+    # composerのインストール(必須ではない)
+    - curl -sS https://getcomposer.org/installer | php
+    - mv composer.phar /usr/local/bin/composer
+
 power_state:
   delay: "+60"
   mode: reboot

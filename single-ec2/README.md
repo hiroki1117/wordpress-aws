@@ -1,5 +1,7 @@
 # EC2 + RDS
 
+![](https://i.gyazo.com/9e97ca9be112c78de6ea55a5fde8dff5.png)
+
 ## 構築手順
 1. terraform apply
 2. EC2インスタンスにアクセスしてRDSのセットアップを行う
