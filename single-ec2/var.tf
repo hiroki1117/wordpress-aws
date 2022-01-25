@@ -67,5 +67,6 @@ variable "db_username" {
 variable "db_password" {
   type    = string
   default = "hoge1117"
+  # 使用する時は変更してね
 }
 
