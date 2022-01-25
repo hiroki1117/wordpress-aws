@@ -19,14 +19,16 @@ module "vpc" {
   name = var.vpc_name
   cidr = var.cidr
 
-  azs             = var.azs
-  private_subnets = var.public_subnets
-  public_subnets  = var.private_subnets
+  azs             = var.azs 
+  public_subnets  = var.public_subnets
+  database_subnets = var.private_subnets
 
   enable_nat_gateway = false
   enable_vpn_gateway = false
   enable_dns_hostnames = true
   enable_dns_support   = true
+
+  create_database_subnet_group = true
 }
 
 #EC2 SG
@@ -95,10 +97,24 @@ module "ec2_instance" {
   vpc_security_group_ids = [module.http80_sg.security_group_id, module.https443_sg.security_group_id, module.ssh22_sg.security_group_id]
   subnet_id              = element(module.vpc.public_subnets, 0)
 
-  user_data_base64 = base64encode(file("./script.sh"))
+  user_data_base64 = base64encode(file("./cloud-init.tpl"))
 }
 
 resource "aws_eip" "eip" {
     instance = module.ec2_instance.id
 }
 
+# RDS
+resource "aws_db_instance" "db" {
+    allocated_storage      = 10
+    storage_type           = "gp2"
+    engine                 = var.engine
+    engine_version         = var.engine_version
+    instance_class         = var.db_instance
+    identifier             = var.db_name
+    username               = var.db_username
+    password               = var.db_password
+    skip_final_snapshot    = true #Terraform destroyするためには必要
+    vpc_security_group_ids = [module.mysql_sg.security_group_id]
+    db_subnet_group_name   = module.vpc.database_subnet_group_name
+}
