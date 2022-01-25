@@ -94,12 +94,11 @@ module "ec2_instance" {
   monitoring             = true
   vpc_security_group_ids = [module.http80_sg.security_group_id, module.https443_sg.security_group_id, module.ssh22_sg.security_group_id]
   subnet_id              = element(module.vpc.public_subnets, 0)
+
+  user_data_base64 = base64encode(file("./script.sh"))
 }
 
 resource "aws_eip" "eip" {
     instance = module.ec2_instance.id
 }
-
-
-
 
