@@ -25,6 +25,8 @@ module "vpc" {
 
   enable_nat_gateway = false
   enable_vpn_gateway = false
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 }
 
 #EC2 SG
@@ -71,10 +73,32 @@ module "mysql_sg" {
 }
 
 
+#EC2 Instance
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
 
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-kernel-*-x86_64-gp2"]
+  }
+}
 
+module "ec2_instance" {
+  source  = "terraform-aws-modules/ec2-instance/aws"
 
+  name = "wp-instance"
 
+  ami                    = data.aws_ami.amazon_linux.id
+  instance_type          = var.incetance_type
+  monitoring             = true
+  vpc_security_group_ids = [module.http80_sg.security_group_id, module.https443_sg.security_group_id, module.ssh22_sg.security_group_id]
+  subnet_id              = element(module.vpc.public_subnets, 0)
+}
+
+resource "aws_eip" "eip" {
+    instance = module.ec2_instance.id
+}
 
 
 

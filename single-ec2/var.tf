@@ -31,3 +31,8 @@ variable "private_subnets" {
     "192.168.101.0/24"
   ]
 }
+
+variable "incetance_type" {
+  type    = string
+  default = "t2.micro"
+}
